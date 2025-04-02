@@ -36,12 +36,6 @@ This server acts as a bridge between LLMs and the Trend Vision One API, allowing
    npm install
    ```
 
-3. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Then edit the `.env` file to add your Trend Vision One API access token.
-
 ## Configuration
 
 The server uses environment variables for configuration:
@@ -59,11 +53,6 @@ The default region is set to `https://api.mea.xdr.trendmicro.com`. If you need t
 
    ```bash
    npm run build
-   ```
-
-2. Start the MCP server:
-   ```bash
-   npm start
    ```
 
 The server will start running on stdio, which allows it to communicate with LLM clients.
@@ -178,11 +167,3 @@ The configuration file is typically located at `claude_desktop_config.json`. You
 1. Reboot Claude Desktop
 2. Check for the Trend Vision tool in the interface
 3. Try asking Claude to retrieve some alerts to verify the integration is working
-
-## License
-
-[Your license information here]
-
-## Contributing
-
-[Your contribution guidelines here]
