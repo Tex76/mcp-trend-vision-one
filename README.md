@@ -167,3 +167,8 @@ The configuration file is typically located at `claude_desktop_config.json`. You
 1. Reboot Claude Desktop
 2. Check for the Trend Vision tool in the interface
 3. Try asking Claude to retrieve some alerts to verify the integration is working
+
+## Example Screenshots
+
+Below are some example screenshots showing the Trend Vision One MCP Server in action:
+![Alert List Example](./exampleShoot.png)
