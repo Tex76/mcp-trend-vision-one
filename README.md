@@ -191,12 +191,5 @@ Below are some example screenshots showing the Trend Vision One MCP Server in ac
 
 ### Alert List View
 
-![Alert List Example](./screenshots/exampleShoot.png)
+![Alert List Example](./exampleShoot.png)
 _Screenshot showing an example of alert listing through Claude_
-
-### Alert Details and Investigation Summary
-
-![Alert Details Example](./screenshots/exampleShoot.png)
-_Screenshot showing detailed alert information with AI-generated investigation summary_
-
-> **Note**: Place your screenshots in a `screenshots` directory at the root of your project. You may need to create this directory first.
