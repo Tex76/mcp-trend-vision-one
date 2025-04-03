@@ -11,6 +11,7 @@ This server acts as a bridge between LLMs and the Trend Vision One API, allowing
 - Get a list of security alerts with customizable filtering and sorting
 - Retrieve detailed information about specific alerts
 - Access investigation notes related to alerts
+- Add investigation notes to alerts for collaboration
 - Generate AI-powered summaries of findings and impact assessments
 - Provide recommended actions based on alert severity
 
@@ -35,6 +36,8 @@ This server acts as a bridge between LLMs and the Trend Vision One API, allowing
    ```bash
    npm install
    ```
+
+   Then edit the `.env` file to add your Trend Vision One API access token.
 
 ## Configuration
 
@@ -96,6 +99,18 @@ Gets detailed information about a specific alert, including notes and an AI-gene
 **Example LLM prompt:**
 "Give me details about alert ABC123 with a summary of findings"
 
+#### 4. add-alert-note
+
+Adds a new investigation note to a specific alert, allowing for collaborative investigation and documentation of findings.
+
+**Parameters:**
+
+- `alertId` (required): The unique identifier of the alert to add a note to
+- `content` (required): The content of the note (1-10,000 characters)
+
+**Example LLM prompt:**
+"Add a note to alert ABC123 saying 'Investigated the endpoint and found malware XYZ. Isolated the system.'"
+
 ### Example Conversation
 
 Here's an example of how you might interact with this server through an LLM:
@@ -106,6 +121,8 @@ Here's an example of how you might interact with this server through an LLM:
 4. **LLM:** "I'll get detailed information about that alert" (calls get-alert-details with the alert ID)
 5. **User:** "What actions should we take for this alert?"
 6. **LLM:** "Based on the alert details and recommended actions..." (provides analysis based on the alert summary)
+7. **User:** "Add a note that says 'Following recommended actions. Investigating affected systems.'"
+8. **LLM:** "I've added your note to the alert" (calls add-alert-note with the alertId and content)
 
 ## Connecting to LLM Clients
 
@@ -171,4 +188,15 @@ The configuration file is typically located at `claude_desktop_config.json`. You
 ## Example Screenshots
 
 Below are some example screenshots showing the Trend Vision One MCP Server in action:
-![Alert List Example](./exampleShoot.png)
+
+### Alert List View
+
+![Alert List Example](./screenshots/exampleShoot.png)
+_Screenshot showing an example of alert listing through Claude_
+
+### Alert Details and Investigation Summary
+
+![Alert Details Example](./screenshots/exampleShoot.png)
+_Screenshot showing detailed alert information with AI-generated investigation summary_
+
+> **Note**: Place your screenshots in a `screenshots` directory at the root of your project. You may need to create this directory first.

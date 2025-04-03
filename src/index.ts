@@ -41,6 +41,38 @@ async function makeTrendRequest<T>(url: string): Promise<T | null> {
   }
 }
 
+// Add a function specifically for POST requests to Trend Micro API
+async function postTrendRequest<T>(url: string, body: any): Promise<T | null> {
+  const headers = {
+    Authorization: `Bearer ${ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "Unknown error");
+      throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+    }
+
+    // For 204 No Content responses, return an empty object
+    if (response.status === 204) {
+      return {} as T;
+    }
+
+    const data = await response.json();
+    return data as T;
+  } catch (error) {
+    console.error("Error:", error);
+    return null;
+  }
+}
+
 interface AlertsList {}
 
 // Create an interface for alerts response
@@ -78,7 +110,7 @@ const systemDefaults: SystemInstructions = {
     endDate: new Date().toISOString(),
   },
   defaultFilters: {
-    status: "in_progress",
+    status: "new",
     sortBy: "lastUpdatedDateTime",
     sortOrder: "desc",
   },
@@ -114,7 +146,7 @@ server.tool(
 // Modify the main get-alerts-list tool to include instructions in the description
 server.tool(
   "get-alerts-list",
-  "Get alerts list from Trend Vision One API. IMPORTANT: By default, you should filter for 'in_progress' status alerts from 2020 until today, sorted by lastUpdatedDateTime in descending order, unless the user explicitly asks for different criteria.",
+  "Get alerts list from Trend Vision One API. IMPORTANT: By default, you should filter for 'new' status alerts from 2020 until today, sorted by lastUpdatedDateTime in descending order, unless the user explicitly asks for different criteria.",
   {
     startDateTime: z
       .string()
@@ -157,7 +189,7 @@ server.tool(
     status: z
       .enum(["new", "in_progress", "closed", "reopened"])
       .optional()
-      .describe("Filter by alert status. Default: in_progress"),
+      .describe("Filter by alert status. Default: new"),
     sourceProduct: z.string().optional().describe("Filter by source product"),
     model: z.string().optional().describe("Filter by alert model"),
     description: z
@@ -409,6 +441,72 @@ function generateRecommendedActions(
 
   return recommendations;
 }
+
+// Add tool for creating notes for alerts
+server.tool(
+  "add-alert-note",
+  "Add a new investigation note to a specific alert in Trend Vision One",
+  {
+    alertId: z
+      .string()
+      .min(1)
+      .describe("The unique identifier of the alert to add a note to"),
+    content: z
+      .string()
+      .min(1)
+      .max(10000)
+      .describe("The content of the note to add (max 10000 characters)"),
+  },
+  async (params) => {
+    const { alertId, content } = params;
+
+    // Create the URL for adding notes to this specific alert
+    const url = `${API_BASE_URL}/v3.0/workbench/alerts/${encodeURIComponent(
+      alertId
+    )}/notes`;
+
+    // Make the POST request with the note content
+    const result = await postTrendRequest(url, { content });
+
+    if (result !== null) {
+      // If successful, get the updated notes to return them
+      const notes = await getAlertNotes(alertId);
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: true,
+                message: "Note added successfully",
+                notes: notes?.items || [],
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    } else {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: false,
+                message: "Failed to add note to the alert",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    }
+  }
+);
 
 async function main() {
   const transport = new StdioServerTransport();
